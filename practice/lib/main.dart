@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:math'; // 用於隨機變色
+import 'package:shared_preferences/shared_preferences.dart'; // 儲存數據
 
 void main() {
   runApp(MyApp());
 }
 
-// 這是我們的主要 Widget，代表整個 App
+// 主要 App Widget
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -15,50 +17,85 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// 這是我們的首頁（StatefulWidget），允許 UI 變動
+// 主畫面 StatefulWidget
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-// 這裡是狀態管理類別，負責控制 UI 的變化
 class _HomeScreenState extends State<HomeScreen> {
   int counter = 0; // 計數器變數
+  Color _backgroundColor = Colors.lightBlue[50]!; // 初始背景顏色
 
-  // 增加計數的函式
+  @override
+  void initState() {
+    super.initState();
+    loadCounter(); // 讀取儲存的計數值
+  }
+
+  // 增加計數
   void incrementCounter() {
     setState(() {
-      counter++; // 更新計數器數值
+      counter++;
     });
     changeColor();
+    saveCounter();
   }
 
-  // 重置計數的函式
-  void resetCounter() {
-    setState(() {
-      counter = 0; // 將計數器歸零
-    });
-    changeColor();
-  }
-
-  void decreaceCounter() {
+  // 減少計數
+  void decreaseCounter() {
     setState(() {
       counter--;
     });
     changeColor();
+    saveCounter();
   }
 
-  void changeColor() {}
+  // 重置計數
+  void resetCounter() {
+    setState(() {
+      counter = 0;
+    });
+    changeColor();
+    saveCounter();
+  }
+
+  // 隨機改變背景顏色
+  void changeColor() {
+    Color myColors =
+        [
+          Colors.blue,
+          Colors.purple,
+          Colors.pink,
+          Colors.teal,
+          Colors.indigo,
+          Colors.cyan,
+        ][Random().nextInt(5)]; // 隨機選擇一種顏色
+    setState(() {
+      _backgroundColor = myColors;
+    });
+  }
+
+  // 儲存計數值到本地存儲
+  void saveCounter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('counter', counter);
+  }
+
+  // 載入儲存的計數值
+  void loadCounter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      counter = prefs.getInt('counter') ?? 0; // 預設值為 0
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("計數器 App"), // 設定 AppBar 標題
-        backgroundColor: Colors.blueGrey, // 更改 AppBar 背景顏色
-      ),
+      appBar: AppBar(title: Text("計數器 App"), backgroundColor: Colors.blueGrey),
       body: Container(
-        color: Colors.lightBlue[50], // 設定背景顏色
+        color: _backgroundColor, // 設定動態背景顏色
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -76,21 +113,21 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: incrementCounter, // 點擊時增加計數
+            onPressed: incrementCounter,
             child: Icon(Icons.add),
-            backgroundColor: Colors.green, // 按鈕顏色
+            backgroundColor: Colors.green,
           ),
-          SizedBox(width: 10), // 按鈕間距
+          SizedBox(width: 10),
           FloatingActionButton(
-            onPressed: resetCounter, // 點擊時重置計數
+            onPressed: resetCounter,
             child: Icon(Icons.refresh),
-            backgroundColor: Colors.red, // 按鈕顏色
+            backgroundColor: Colors.red,
           ),
-          SizedBox(width: 10), // 按鈕間距
+          SizedBox(width: 10),
           FloatingActionButton(
-            onPressed: decreaceCounter, // 點擊時重置計數
-            child: Icon(Icons.delete),
-            backgroundColor: Colors.yellow[900], // 按鈕顏色
+            onPressed: decreaseCounter,
+            child: Icon(Icons.remove),
+            backgroundColor: Colors.orange,
           ),
         ],
       ),
