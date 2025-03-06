@@ -1,71 +1,99 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
+// 這是我們的主要 Widget，代表整個 App
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false, // 隱藏 debug 標籤
+      home: HomeScreen(), // 設定首頁
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+// 這是我們的首頁（StatefulWidget），允許 UI 變動
+class HomeScreen extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+// 這裡是狀態管理類別，負責控制 UI 的變化
+class _HomeScreenState extends State<HomeScreen> {
+  int counter = 0; // 計數器變數
 
-  void _incrementCounter() {
+  // 增加計數的函式
+  void incrementCounter() {
     setState(() {
-      _counter++;
+      counter++; // 更新計數器數值
     });
+    changeColor();
   }
+
+  // 重置計數的函式
+  void resetCounter() {
+    setState(() {
+      counter = 0; // 將計數器歸零
+    });
+    changeColor();
+  }
+
+  void decreaceCounter() {
+    setState(() {
+      counter--;
+    });
+    changeColor();
+  }
+
+  void changeColor() {}
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text("計數器 App"), // 設定 AppBar 標題
+        backgroundColor: Colors.blueGrey, // 更改 AppBar 背景顏色
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+      body: Container(
+        color: Colors.lightBlue[50], // 設定背景顏色
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("你點擊的次數：", style: TextStyle(fontSize: 20)),
+              Text(
+                "$counter",
+                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: incrementCounter, // 點擊時增加計數
+            child: Icon(Icons.add),
+            backgroundColor: Colors.green, // 按鈕顏色
+          ),
+          SizedBox(width: 10), // 按鈕間距
+          FloatingActionButton(
+            onPressed: resetCounter, // 點擊時重置計數
+            child: Icon(Icons.refresh),
+            backgroundColor: Colors.red, // 按鈕顏色
+          ),
+          SizedBox(width: 10), // 按鈕間距
+          FloatingActionButton(
+            onPressed: decreaceCounter, // 點擊時重置計數
+            child: Icon(Icons.delete),
+            backgroundColor: Colors.yellow[900], // 按鈕顏色
+          ),
+        ],
+      ),
     );
   }
 }
