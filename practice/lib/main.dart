@@ -26,11 +26,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int counter = 0; // 計數器變數
   Color _backgroundColor = Colors.lightBlue[50]!; // 初始背景顏色
+  bool light = true;
 
   @override
   void initState() {
     super.initState();
     loadCounter(); // 讀取儲存的計數值
+    loadLight();
+    loadBackgroundColor();
   }
 
   // 增加計數
@@ -62,18 +65,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 隨機改變背景顏色
   void changeColor() {
-    Color myColors =
+    Color lightColors =
         [
-          Colors.blue,
-          Colors.purple,
-          Colors.pink,
-          Colors.teal,
-          Colors.indigo,
-          Colors.cyan,
+          Colors.blue[100]!,
+          Colors.purple[100]!,
+          Colors.pink[100]!,
+          Colors.teal[100]!,
+          Colors.indigo[100]!,
+          Colors.cyan[100]!,
+        ][Random().nextInt(5)]; // 隨機選擇一種顏色
+    Color darkColors =
+        [
+          Colors.blue[500]!,
+          Colors.purple[500]!,
+          Colors.pink[500]!,
+          Colors.teal[500]!,
+          Colors.indigo[500]!,
+          Colors.cyan[500]!,
         ][Random().nextInt(5)]; // 隨機選擇一種顏色
     setState(() {
-      _backgroundColor = myColors;
+      _backgroundColor = light ? lightColors : darkColors;
     });
+    saveBackgroundColor();
   }
 
   // 儲存計數值到本地存儲
@@ -90,10 +103,47 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void saveLight() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('light', light);
+  }
+
+  void loadLight() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      light = prefs.getBool('light') ?? true;
+    });
+  }
+
+  void changeLight() {
+    setState(() {
+      light = !light;
+    });
+    saveLight();
+  }
+
+  void saveBackgroundColor() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('backgroundColor', _backgroundColor.value);
+  }
+
+  void loadBackgroundColor() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      int colorValue =
+          prefs.getInt('backgroundColor') ?? Colors.lightBlue[50]!.value;
+      _backgroundColor = Color(colorValue);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("計數器 App"), backgroundColor: Colors.blueGrey),
+      appBar: AppBar(
+        title: Text("計數器 App"),
+        backgroundColor: light ? Colors.blueGrey : Colors.black,
+      ),
+
       body: Container(
         color: _backgroundColor, // 設定動態背景顏色
         child: Center(
@@ -128,6 +178,12 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: decreaseCounter,
             child: Icon(Icons.remove),
             backgroundColor: Colors.orange,
+          ),
+          SizedBox(width: 10),
+          FloatingActionButton(
+            onPressed: changeLight,
+            child: Icon(Icons.sunny),
+            backgroundColor: light ? Colors.yellow : Colors.grey[800],
           ),
         ],
       ),
